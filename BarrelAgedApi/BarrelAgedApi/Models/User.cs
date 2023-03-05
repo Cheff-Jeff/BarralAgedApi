@@ -18,6 +18,9 @@ namespace BarrelAgedApi.Models
 
         public string Salt { get; set; } = "";
 
+        public string? Key { get; set; }
+        public string? FingerPrint { get; set; }
+
         public User(){}
 
         public User(UserDto dto)

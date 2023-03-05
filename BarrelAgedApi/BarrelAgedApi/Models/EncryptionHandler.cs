@@ -29,5 +29,14 @@ namespace BarrelAgedApi.Models
 
             return Convert.ToBase64String(rfc2898DeriveBytes.GetBytes(256)) == password;
         }
+
+        public bool VerifySignature(byte[] key, byte[] signature, byte[] signatureHash, HashAlgorithmName hashAlgorithm) 
+        {
+            var ecdsa = ECDsa.Create();
+            ecdsa.ImportSubjectPublicKeyInfo(key, out _);
+            bool isValid = ecdsa.VerifyData(signature, signatureHash, HashAlgorithmName.SHA256);
+            return isValid;
+            // Print the result
+        }
     }
 }

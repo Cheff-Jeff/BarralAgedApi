@@ -3,6 +3,8 @@ using BarrelAgedApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BarrelAgedApi.Controllers
 {
@@ -68,6 +70,48 @@ namespace BarrelAgedApi.Controllers
                 return BadRequest("Information not complete");
             }
             return BadRequest("User already exists");
+        }
+
+        [HttpPost]
+        [Route("NewFingerAuth")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> NewFingerAuth(FingerSignDto fingerDto)
+        {
+            User? user = await _context.Users.FirstOrDefaultAsync(u => u.Email == fingerDto.email);
+            if (user != null)
+            {
+                user.Key = fingerDto.publicKey;
+                user.FingerPrint = fingerDto.signatureHash;
+                _context.Entry(user).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            return BadRequest("User not found");
+        }
+
+        [HttpPost]
+        [Route("FingerAuth")]
+        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> FingerAuth(FingerSignDto fingerDto)
+        {
+            if (fingerDto.publicKey != null && fingerDto.signature != null) 
+            {
+                User? user = await _context.Users.FirstOrDefaultAsync(u => u.Key == fingerDto.publicKey);
+                if (user != null)
+                {
+                    //EncryptionHandler handler = new EncryptionHandler();
+                    //bool verify = handler.VerifySignature(
+                    //    Convert.FromBase64String(user.Key),
+                    //    Encoding.UTF8.GetBytes(fingerDto.signature), 
+                    //    Convert.FromBase64String(fingerDto.signatureHash),
+                    //    HashAlgorithmName.SHA512);
+                    return Ok(user);
+                }
+                return BadRequest("User not found");
+            }
+            return BadRequest("Insufficient information.");
         }
     }
 }
