@@ -44,5 +44,21 @@ namespace BarrelAgedApi.Controllers
             }
             return BadRequest("User not found");
         }
+
+        [HttpPost]
+        [Route("getbeersbydate")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getBeersByUserId(string date)
+        {
+            if (date != null)
+            {
+                string GoodDate = date.Replace("_", " ");
+                var beers = await _context.Beers.Where(u => u.beerDate == GoodDate)
+                        .ToListAsync();
+                return Ok(beers);
+            }
+            return BadRequest("User not found");
+        }
     }
 }
