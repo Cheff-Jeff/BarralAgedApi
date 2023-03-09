@@ -21,6 +21,9 @@ namespace BarrelAgedApi.Models
         public string? Key { get; set; }
         public string? FingerPrint { get; set; }
 
+        public ICollection<Beer> Beers { get; set; }
+
+
         public User(){}
 
         public User(UserDto dto)
